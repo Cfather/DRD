@@ -1,4 +1,4 @@
-function  [dcrfvdq, dcrfvdqd] = d_crf( v, dvdq, dvdqd, NB )
+function  [dcrfvdq, dcrfvdqd] = d_crf( v, dvdq, dvdqd, NB, ifsymbolic )
 
 % crf  spatial/planar cross-product operator (force).
 % crf(v)  calculates the 6x6 (or 3x3) matrix such that the expression
@@ -9,7 +9,11 @@ function  [dcrfvdq, dcrfvdqd] = d_crf( v, dvdq, dvdqd, NB )
 
 % vcross = -crm(v)';
 
-[dcrfvdq, dcrfvdqd] = d_crm( v, dvdq, dvdqd, NB );
+if nargin < 5
+    [dcrfvdq, dcrfvdqd] = d_crm( v, dvdq, dvdqd, NB );
+else
+    [dcrfvdq, dcrfvdqd] = d_crm( v, dvdq, dvdqd, NB, ifsymbolic );
+end
 
 for i = 1:NB
     dcrfvdq(:,:,i) = -dcrfvdq(:,:,i)';
