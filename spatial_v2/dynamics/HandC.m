@@ -47,8 +47,7 @@ for i = model.NB:-1:1
   end
 end
 
-% H = zeros(model.NB);
-H = sym(zeros(model.NB));
+H = zeros(model.NB);
 
 for i = 1:model.NB
   fh = IC{i} * S{i};
