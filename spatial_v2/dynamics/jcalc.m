@@ -26,6 +26,15 @@ switch code
   case {'R','Rz'}			% revolute Z axis
     Xj = rotz(q);
     S = [0;0;1;0;0;0];
+  case '-Rx'				% reversed revolute X axis
+    Xj = rotx(-q);
+    S = [-1;0;0;0;0;0];
+  case '-Ry'				% reversed revolute Y axis
+    Xj = roty(-q);
+    S = [0;-1;0;0;0;0];
+  case {'-R','-Rz'}			% reversed revolute Z axis
+    Xj = rotz(-q);
+    S = [0;0;-1;0;0;0];
   case 'Px'				% prismatic X axis
     Xj = xlt([q 0 0]);
     S = [0;0;0;1;0;0];

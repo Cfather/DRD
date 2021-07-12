@@ -51,7 +51,7 @@ H = zeros(model.NB);
 
 for i = 1:model.NB
   fh = IC{i} * S{i};
-  H(i,i) = S{i}' * fh;
+  H(i,i) = S{i}' * fh + model.transmissionInertia{i};
   j = i;
   while model.parent(j) > 0
     fh = Xup{j}' * fh;

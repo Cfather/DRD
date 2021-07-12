@@ -16,7 +16,7 @@ function [name, links, joints, transmissions] = ros_load_urdf(urdf_file, N)
     urdf = xmlread(urdf_file);
     
     if nargin < 2
-        N = 5;
+        N = 10;
     end
     
     xml_robot = urdf.getElementsByTagName('robot').item(0);
