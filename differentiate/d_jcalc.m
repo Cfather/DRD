@@ -1,4 +1,4 @@
-function  [Xj,dXjdq,S] = d_jcalc( jtyp, q )
+function  [Xj,dXjdq,ddXjddq,S] = d_jcalc( jtyp, q )
 
 % jcalc  joint transform and motion subspace matrices.
 % [Xj,S]=jcalc(type,q)  returns the joint transform and motion subspace
@@ -20,42 +20,52 @@ switch code
   case 'Rx'				% revolute X axis
     Xj = rotx(q);
     dXjdq = d_rotx(q);
+    ddXjddq = dd_rotx(q);
     S = [1;0;0;0;0;0];
   case 'Ry'				% revolute Y axis
     Xj = roty(q);
     dXjdq = d_roty(q);
+    ddXjddq = dd_roty(q);
     S = [0;1;0;0;0;0];
   case {'R','Rz'}			% revolute Z axis
     Xj = rotz(q);
     dXjdq = d_rotz(q);
+    ddXjddq = dd_rotz(q);
     S = [0;0;1;0;0;0];
   case '-Rx'				% reversed revolute X axis
     Xj = rotx(-q);
     dXjdq = d_rotx(-q);
+    ddXjddq = dd_rotx(-q);
     S = [-1;0;0;0;0;0];
   case '-Ry'				% reversed revolute Y axis
     Xj = roty(-q);
     dXjdq = d_roty(-q);
+    ddXjddq = dd_roty(-q);
     S = [0;-1;0;0;0;0];
   case {'-R','-Rz'}			% reversed revolute Z axis
     Xj = rotz(-q);
     dXjdq = d_rotz(-q);
+    ddXjddq = dd_rotz(-q);
     S = [0;0;-1;0;0;0];
   case 'Px'				% prismatic X axis
     Xj = xlt([q 0 0]);
     dXjdq = d_xlt(1);
+    ddXjddq = zeros(6,6);
     S = [0;0;0;1;0;0];
   case 'Py'				% prismatic Y axis
     Xj = xlt([0 q 0]);
     dXjdq = d_xlt(2);
+    ddXjddq = zeros(6,6);
     S = [0;0;0;0;1;0];
   case {'P','Pz'}			% prismatic Z axis
     Xj = xlt([0 0 q]);
     dXjdq = d_xlt(3);
+    ddXjddq = zeros(6,6);
     S = [0;0;0;0;0;1];
   case 'r'				% planar revolute
     Xj = plnr( q, [0 0] );
     dXjdq = d_plnr(q, [0 0] );
+    ddXjddq = dd_plnr(q, [0 0] );
     S = [1;0;0];
   otherwise
     error( 'unrecognised joint code ''%s''', code );
