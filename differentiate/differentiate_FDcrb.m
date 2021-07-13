@@ -1,34 +1,33 @@
-clear; clc;
+function [H,C,dHdq,dCdx,ddHddq,ddCddx] = differentiate_FDcrb(model, q, qd)
 
-ifsymbolic = false;
-ifjacobian = true;
-ifhessian = true;
-ifsimplify = false;
+if nargout >= 4
+    ifjacobian = true;
+else
+    ifjacobian = false;
+end
+
+if nargout == 6
+    ifhessian = true;
+else
+    ifhessian = false;
+end
+
+if isa(q, 'sym')
+    input_type = 'sym';
+else
+    if isa(q, 'intval')
+        input_type = 'intval';
+    else
+        input_type = 'number';
+    end
+end
 
 if ifhessian
     ifjacobian = true;
 end
 
-model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\cassie_Lpinned.urdf', 'x');
-% model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\rabbit_pinned.urdf', 'y');
-% model = rabbit;
 N = model.NB;
 SpaSize = size(model.I{1},1);
-if ifsymbolic
-    q = sym('q',[N,1],'real');
-    qd = sym('qd',[N,1],'real');
-else
-    q = 2*pi*rand(N,1);
-    qd = 2*pi*rand(N,1);
-%     q = [0:(N-1)]';
-%     qd = [-1:-1:(-N)]';
-    
-%     M = LP_M(q);
-%     F = LP_F(q,qd);
-%     M = rabbit_pinned_M(q);
-%     F = rabbit_pinned_F(q,qd);
-end
-% x = [q;qd];
 
 a_grav = get_gravity(model);
 
@@ -36,7 +35,7 @@ a_grav = get_gravity(model);
 % 1. Xup (Xup{i} -> q{i})
 % 2. fvp (fvp{i} -> q{1:i}, qd{1:i})
 % 3. IC  (IC{i}  -> q{1:i})
-tic;
+
 Xup = cell(1,N);
 v = cell(1,N);
 avp = cell(1,N);
@@ -47,38 +46,21 @@ if ifjacobian
     dvdx = cell(1,N);
     davpdx = cell(1,N);
     dfvpdx = cell(1,N);
-    if ifsymbolic
-        for i = 1:N
-            dXupdq{i} = sym(zeros(SpaSize,SpaSize));
-        end
+    
+    for i = 1:N
+        dXupdq{i} = initialize_array(input_type,[SpaSize,SpaSize]);
+    end
 
-        for i = 1:N
-            dvdx{i} = sym(zeros(SpaSize,2*N));
-        end
+    for i = 1:N
+        dvdx{i} = initialize_array(input_type,[SpaSize,2*N]);
+    end
 
-        for i = 1:N
-            davpdx{i} = sym(zeros(SpaSize,2*N));
-        end
+    for i = 1:N
+        davpdx{i} = initialize_array(input_type,[SpaSize,2*N]);
+    end
 
-        for i = 1:N
-            dfvpdx{i} = sym(zeros(SpaSize,2*N));
-        end
-    else
-        for i = 1:N
-            dXupdq{i} = zeros(SpaSize,SpaSize);
-        end
-
-        for i = 1:N
-            dvdx{i} = zeros(SpaSize,2*N);
-        end
-
-        for i = 1:N
-            davpdx{i} = zeros(SpaSize,2*N);
-        end
-
-        for i = 1:N
-            dfvpdx{i} = zeros(SpaSize,2*N);
-        end
+    for i = 1:N
+        dfvpdx{i} = initialize_array(input_type,[SpaSize,2*N]);
     end
 end
 
@@ -87,38 +69,21 @@ if ifhessian
     ddvddx = cell(1,N);
     ddavpddx = cell(1,N);
     ddfvpddx = cell(1,N);
-    if ifsymbolic
-        for i = 1:N
-            ddXupddq{i} = sym(zeros(SpaSize,SpaSize));
-        end
 
-        for i = 1:N
-            ddvddx{i} = sym(zeros(SpaSize,2*N,2*N));
-        end
+    for i = 1:N
+        ddXupddq{i} = initialize_array(input_type,[SpaSize,SpaSize]);
+    end
 
-        for i = 1:N
-            ddavpddx{i} = sym(zeros(SpaSize,2*N,2*N));
-        end
+    for i = 1:N
+        ddvddx{i} = initialize_array(input_type,[SpaSize,2*N,2*N]);
+    end
 
-        for i = 1:N
-            ddfvpddx{i} = sym(zeros(SpaSize,2*N,2*N));
-        end
-    else
-        for i = 1:N
-            ddXupddq{i} = zeros(SpaSize,SpaSize);
-        end
+    for i = 1:N
+        ddavpddx{i} = initialize_array(input_type,[SpaSize,2*N,2*N]);
+    end
 
-        for i = 1:N
-            ddvddx{i} = zeros(SpaSize,2*N,2*N);
-        end
-
-        for i = 1:N
-            ddavpddx{i} = zeros(SpaSize,2*N,2*N);
-        end
-
-        for i = 1:N
-            ddfvpddx{i} = zeros(SpaSize,2*N,2*N);
-        end
+    for i = 1:N
+        ddfvpddx{i} = initialize_array(input_type,[SpaSize,2*N,2*N]);
     end
 end
 
@@ -203,7 +168,7 @@ for i = 1:N
     avp{i} = Xup{i}*avp{model.parent(i)} + crm(v{i})*vJ;
     
     if ifjacobian
-        [dcrmvdq, dcrmvdqd] = d_crm( v{i}, dvdx{i}(:,1:N), dvdx{i}(:,(N+1):(2*N)), N, ifsymbolic );
+        [dcrmvdq, dcrmvdqd] = d_crm( v{i}, dvdx{i}(:,1:N), dvdx{i}(:,(N+1):(2*N)), N, input_type );
         for k = 1:N 
           if k == i
             davpdx{i}(:,k) = dXupdq{i}*avp{model.parent(i)} + Xup{i}*davpdx{model.parent(i)}(:,k) + dcrmvdq(:,:,k)*vJ;  
@@ -216,7 +181,7 @@ for i = 1:N
     end
     
     if ifhessian
-         ddcrmvddx = dd_crm( v{i}, ddvddx{i}, N, ifsymbolic );
+         ddcrmvddx = dd_crm( v{i}, ddvddx{i}, N, input_type );
          for k1 = 1:N
            for k2 = 1:k1
              if k1 == k2
@@ -264,7 +229,7 @@ for i = 1:N
   fvp{i} = model.I{i}*avp{i} + crf(v{i})*model.I{i}*v{i};
   
   if ifjacobian
-      [dcrfvdq, dcrfvdqd] = d_crf( v{i}, dvdx{i}(:,1:N), dvdx{i}(:,(N+1):(2*N)), N, ifsymbolic );
+      [dcrfvdq, dcrfvdqd] = d_crf( v{i}, dvdx{i}(:,1:N), dvdx{i}(:,(N+1):(2*N)), N, input_type );
       
       for k = 1:N 
         dfvpdx{i}(:,k) = model.I{i}*davpdx{i}(:,k) + dcrfvdq(:,:,k)*model.I{i}*v{i} + crf(v{i})*model.I{i}*dvdx{i}(:,k);
@@ -273,7 +238,7 @@ for i = 1:N
   end
   
   if ifhessian
-      ddcrfvddx = dd_crf( v{i}, ddvddx{i}, N, ifsymbolic );
+      ddcrfvddx = dd_crf( v{i}, ddvddx{i}, N, input_type );
       
       for k1 = 1:N
         for k2 = 1:k1
@@ -293,26 +258,14 @@ for i = 1:N
   end
 end
 
-if ifsymbolic
-    C = sym(zeros(N,1));
-else
-    C = (zeros(N,1));
-end
+C = initialize_array(input_type,[N,1]);
 
 if ifjacobian
-    if ifsymbolic
-        dCdx = sym(zeros(N,2*N));
-    else
-        dCdx = (zeros(N,2*N));
-    end
+    dCdx = initialize_array(input_type,[N,2*N]);
 end
 
 if ifhessian
-    if ifsymbolic
-        ddCddx = sym(zeros(N,2*N,2*N));
-    else
-        ddCddx = (zeros(N,2*N,2*N));
-    end
+    ddCddx = initialize_array(input_type,[N,2*N,2*N]);
 end
 
 for i = N:-1:1
@@ -392,27 +345,17 @@ IC = model.I;				% composite inertia calculation
 
 if ifjacobian
     dICdq = cell(1,N);
-    if ifsymbolic
-        for i = N:-1:1
-            dICdq{i} = sym(zeros(SpaSize,SpaSize,N));
-        end
-    else
-        for i = N:-1:1
-            dICdq{i} = (zeros(SpaSize,SpaSize,N));
-        end
+
+    for i = N:-1:1
+        dICdq{i} = initialize_array(input_type,[SpaSize,SpaSize,N]);
     end
 end
 
 if ifhessian
     ddICddq = cell(1,N);
-    if ifsymbolic
-        for i = N:-1:1
-            ddICddq{i} = sym(zeros(SpaSize,SpaSize,N,N));
-        end
-    else
-        for i = N:-1:1
-            ddICddq{i} = (zeros(SpaSize,SpaSize,N,N));
-        end
+    
+    for i = N:-1:1
+        ddICddq{i} = initialize_array(input_type,[SpaSize,SpaSize,N,N]);
     end
 end
 
@@ -460,37 +403,21 @@ for i = N:-1:1
   end
 end
 
-if ifsymbolic
-    H = sym(zeros(N));
-else
-    H = zeros(N);
-end
+H = initialize_array(input_type,[N,N]);
 
 if ifjacobian
-    if ifsymbolic
-        dHdq = sym(zeros(N,N,N));
-    else
-        dHdq = zeros(N,N,N);
-    end
+    dHdq = initialize_array(input_type,[N,N,N]);
 end
 
 if ifhessian
-    if ifsymbolic
-        ddHddq = sym(zeros(N,N,N,N));
-    else
-        ddHddq = zeros(N,N,N,N);
-    end
+    ddHddq = initialize_array(input_type,[N,N,N,N]);
 end
 
 for i = 1:N
   fh = IC{i} * S{i};
   
   if ifjacobian
-      if ifsymbolic
-        dfhdq = sym(zeros(SpaSize,N));
-      else
-        dfhdq = zeros(SpaSize,N); 
-      end
+      dfhdq = initialize_array(input_type,[SpaSize,N]);
       
       for k = 1:N
         dfhdq(:,k) = dICdq{i}(:,:,k) * S{i};
@@ -498,11 +425,7 @@ for i = 1:N
   end
   
   if ifhessian
-      if ifsymbolic
-        ddfhddq = sym(zeros(SpaSize,N,N));
-      else
-        ddfhddq = zeros(SpaSize,N,N); 
-      end
+      ddfhddq = initialize_array(input_type,[SpaSize,N,N]);
       
       for k1 = 1:N
         for k2 = 1:k1
@@ -604,16 +527,3 @@ for i = 1:N
     end
   end
 end
-
-if ifsymbolic && ifsimplify
-    H = simplify(H);
-    C = simplify(C);
-    
-    if ifjacobian
-        dHdq = simplify(dHdq);
-        dCdx = simplify(dCdx);
-        dCdqd = simplify(dCdqd);
-    end
-end
-
-toc;

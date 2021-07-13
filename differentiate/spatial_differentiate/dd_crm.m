@@ -1,4 +1,4 @@
-function  ddcrmvddx = dd_crm( v, ddvddx, NB, ifsymbolic )
+function  ddcrmvddx = dd_crm( v, ddvddx, NB, input_type )
 
 % crm  spatial/planar cross-product operator (motion).
 % crm(v)  calculates the 6x6 (or 3x3) matrix such that the expression
@@ -6,10 +6,6 @@ function  ddcrmvddx = dd_crm( v, ddvddx, NB, ifsymbolic )
 % length(v)==6 then it is taken to be a spatial vector, and the return
 % value is a 6x6 matrix.  Otherwise, v is taken to be a planar vector, and
 % the return value is 3x3.
-
-if nargin < 4
-    ifsymbolic = false;
-end
 
 if length(v) == 6
 
@@ -20,11 +16,7 @@ if length(v) == 6
 %     	      v(6)  0    -v(4)   v(3)  0    -v(1) ;
 %     	     -v(5)  v(4)  0     -v(2)  v(1)  0 ];
 
-    if ifsymbolic
-        ddcrmvddx = sym(zeros(6,6,2*NB,2*NB));
-    else
-        ddcrmvddx = zeros(6,6,2*NB,2*NB);
-    end
+    ddcrmvddx = initialize_array(input_type, [6,6,2*NB,2*NB]);
     
     ddcrmvddx(1,2,:,:) = -ddvddx(3,:,:);
     ddcrmvddx(2,1,:,:) = ddvddx(3,:,:);
@@ -50,11 +42,7 @@ else
 % 	      v(3)  0    -v(1) ;
 % 	     -v(2)  v(1)  0 ];
 
-    if ifsymbolic
-        ddcrmvddx = sym(zeros(3,3,2*NB,2*NB));
-    else
-        ddcrmvddx = zeros(3,3,2*NB,2*NB);
-    end
+    ddcrmvddx = initialize_array(input_type, [3,3,2*NB,2*NB]);
     
     ddcrmvddx(2,1,:,:) = ddvddx(3,:,:);
     ddcrmvddx(3,1,:,:) = -ddvddx(2,:,:);
