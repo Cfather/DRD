@@ -1,11 +1,12 @@
 clear; clc;
 
-ifsymbolic = false;
-ifjacobian = false;
+ifsymbolic = true;
+ifjacobian = true;
+ifsimplify = false;
 
-model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\cassie_Lpinned.urdf', 'x');
+% model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\cassie_Lpinned.urdf', 'x');
 % model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\rabbit_pinned.urdf', 'y');
-% model = rabbit;
+model = rabbit;
 SpaSize = size(model.I{1},1);
 if ifsymbolic
     q = sym('q',[model.NB,1]);
@@ -16,11 +17,12 @@ else
 %     q = [0:(model.NB-1)]';
 %     qd = [-1:-1:(-model.NB)]';
     
-    M = LP_M(q);
-    F = LP_F(q,qd);
+%     M = LP_M(q);
+%     F = LP_F(q,qd);
 %     M = rabbit_pinned_M(q);
 %     F = rabbit_pinned_F(q,qd);
 end
+% x = [q;qd];
 
 a_grav = get_gravity(model);
 
@@ -29,54 +31,37 @@ a_grav = get_gravity(model);
 % 2. fvp (fvp{i} -> q{1:i}, qd{1:i})
 % 3. IC  (IC{i}  -> q{1:i})
 tic;
-dvdq = cell(1,model.NB);
+Xup = cell(1,model.NB);
+v = cell(1,model.NB);
+avp = cell(1,model.NB);
+fvp = cell(1,model.NB);
+dXupdq = cell(1,model.NB);
+dvdx = cell(1,model.NB);
+davpdx = cell(1,model.NB);
+dfvpdx = cell(1,model.NB);
 if ifsymbolic
     for i = 1:model.NB
-        dvdq{i} = sym(zeros(SpaSize,model.NB));
+        dvdx{i} = sym(zeros(SpaSize,2*model.NB));
     end
-    dvdqd = cell(1,model.NB);
+    
     for i = 1:model.NB
-        dvdqd{i} = sym(zeros(SpaSize,model.NB));
+        davpdx{i} = sym(zeros(SpaSize,2*model.NB));
     end
-    davpdq = cell(1,model.NB);
+    
     for i = 1:model.NB
-        davpdq{i} = sym(zeros(SpaSize,model.NB));
-    end
-    davpdqd = cell(1,model.NB);
-    for i = 1:model.NB
-        davpdqd{i} = sym(zeros(SpaSize,model.NB));
-    end
-    dfvpdq = cell(1,model.NB);
-    for i = 1:model.NB
-        dfvpdq{i} = sym(zeros(SpaSize,model.NB));
-    end
-    dfvpdqd = cell(1,model.NB);
-    for i = 1:model.NB
-        dfvpdqd{i} = sym(zeros(SpaSize,model.NB));
+        dfvpdx{i} = sym(zeros(SpaSize,2*model.NB));
     end
 else
     for i = 1:model.NB
-        dvdq{i} = (zeros(SpaSize,model.NB));
+        dvdx{i} = zeros(SpaSize,2*model.NB);
     end
-    dvdqd = cell(1,model.NB);
+    
     for i = 1:model.NB
-        dvdqd{i} = (zeros(SpaSize,model.NB));
+        davpdx{i} = zeros(SpaSize,2*model.NB);
     end
-    davpdq = cell(1,model.NB);
+    
     for i = 1:model.NB
-        davpdq{i} = (zeros(SpaSize,model.NB));
-    end
-    davpdqd = cell(1,model.NB);
-    for i = 1:model.NB
-        davpdqd{i} = (zeros(SpaSize,model.NB));
-    end
-    dfvpdq = cell(1,model.NB);
-    for i = 1:model.NB
-        dfvpdq{i} = (zeros(SpaSize,model.NB));
-    end
-    dfvpdqd = cell(1,model.NB);
-    for i = 1:model.NB
-        dfvpdqd{i} = (zeros(SpaSize,model.NB));
+        dfvpdx{i} = zeros(SpaSize,2*model.NB);
     end
 end
 
@@ -94,8 +79,8 @@ for i = 1:model.NB
     avp{i} = Xup{i} * -a_grav;
     
     if ifjacobian
-        dvdqd{i}(:,i) = S{i};
-        davpdq{i}(:,i) = dXupdq{i} * -a_grav;
+        dvdx{i}(:,i + model.NB) = S{i};
+        davpdx{i}(:,i) = dXupdq{i} * -a_grav;
     end
   else
     v{i} = Xup{i}*v{model.parent(i)} + vJ;
@@ -103,11 +88,11 @@ for i = 1:model.NB
     if ifjacobian
         for k = 1:model.NB 
           if k == i
-            dvdq{i}(:,k) = dXupdq{i}*v{model.parent(i)} + Xup{i}*dvdq{model.parent(i)}(:,k);  
-            dvdqd{i}(:,k) = Xup{i}*dvdqd{model.parent(i)}(:,k) + S{i};
+            dvdx{i}(:,k) = dXupdq{i}*v{model.parent(i)} + Xup{i}*dvdx{model.parent(i)}(:,k);  
+            dvdx{i}(:,k + model.NB) = Xup{i}*dvdx{model.parent(i)}(:,k + model.NB) + S{i};
           else
-            dvdq{i}(:,k) = Xup{i}*dvdq{model.parent(i)}(:,k);
-            dvdqd{i}(:,k) = Xup{i}*dvdqd{model.parent(i)}(:,k);
+            dvdx{i}(:,k) = Xup{i}*dvdx{model.parent(i)}(:,k);
+            dvdx{i}(:,k + model.NB) = Xup{i}*dvdx{model.parent(i)}(:,k + model.NB);
           end
         end
     end
@@ -115,14 +100,14 @@ for i = 1:model.NB
     avp{i} = Xup{i}*avp{model.parent(i)} + crm(v{i})*vJ;
     
     if ifjacobian
-        [dcrmvdq, dcrmvdqd] = d_crm( v{i}, dvdq{i}, dvdqd{i}, model.NB, ifsymbolic );
+        [dcrmvdq, dcrmvdqd] = d_crm( v{i}, dvdx{i}(:,1:model.NB), dvdx{i}(:,(model.NB+1):(2*model.NB)), model.NB, ifsymbolic );
         for k = 1:model.NB 
           if k == i
-            davpdq{i}(:,k) = dXupdq{i}*avp{model.parent(i)} + Xup{i}*davpdq{model.parent(i)}(:,k) + dcrmvdq(:,:,k)*vJ;  
-            davpdqd{i}(:,k) = Xup{i}*davpdqd{model.parent(i)}(:,k) + dcrmvdqd(:,:,k)*vJ + crm(v{i})*S{i};
+            davpdx{i}(:,k) = dXupdq{i}*avp{model.parent(i)} + Xup{i}*davpdx{model.parent(i)}(:,k) + dcrmvdq(:,:,k)*vJ;  
+            davpdx{i}(:,k + model.NB) = Xup{i}*davpdx{model.parent(i)}(:,k + model.NB) + dcrmvdqd(:,:,k)*vJ + crm(v{i})*S{i};
           else
-            davpdq{i}(:,k) = Xup{i}*davpdq{model.parent(i)}(:,k) + dcrmvdq(:,:,k)*vJ;
-            davpdqd{i}(:,k) = Xup{i}*davpdqd{model.parent(i)}(:,k) + dcrmvdqd(:,:,k)*vJ;
+            davpdx{i}(:,k) = Xup{i}*davpdx{model.parent(i)}(:,k) + dcrmvdq(:,:,k)*vJ;
+            davpdx{i}(:,k + model.NB) = Xup{i}*davpdx{model.parent(i)}(:,k + model.NB) + dcrmvdqd(:,:,k)*vJ;
           end
         end
     end
@@ -130,10 +115,10 @@ for i = 1:model.NB
   fvp{i} = model.I{i}*avp{i} + crf(v{i})*model.I{i}*v{i};
   
   if ifjacobian
-      [dcrfvdq, dcrfvdqd] = d_crf( v{i}, dvdq{i}, dvdqd{i}, model.NB, ifsymbolic );
+      [dcrfvdq, dcrfvdqd] = d_crf( v{i}, dvdx{i}(:,1:model.NB), dvdx{i}(:,(model.NB+1):(2*model.NB)), model.NB, ifsymbolic );
       for k = 1:model.NB 
-        dfvpdq{i}(:,k) = model.I{i}*davpdq{i}(:,k) + dcrfvdq(:,:,k)*model.I{i}*v{i} + crf(v{i})*model.I{i}*dvdq{i}(:,k);
-        dfvpdqd{i}(:,k) = model.I{i}*davpdqd{i}(:,k) + dcrfvdqd(:,:,k)*model.I{i}*v{i} + crf(v{i})*model.I{i}*dvdqd{i}(:,k);
+        dfvpdx{i}(:,k) = model.I{i}*davpdx{i}(:,k) + dcrfvdq(:,:,k)*model.I{i}*v{i} + crf(v{i})*model.I{i}*dvdx{i}(:,k);
+        dfvpdx{i}(:,k + model.NB) = model.I{i}*davpdx{i}(:,k + model.NB) + dcrfvdqd(:,:,k)*model.I{i}*v{i} + crf(v{i})*model.I{i}*dvdx{i}(:,k + model.NB);
       end
   end
 end
@@ -153,8 +138,8 @@ for i = model.NB:-1:1
   
   if ifjacobian
       for k = 1:model.NB 
-        dCdq(i,k) = S{i}' * dfvpdq{i}(:,k);
-        dCdqd(i,k) = S{i}' * dfvpdqd{i}(:,k);
+        dCdq(i,k) = S{i}' * dfvpdx{i}(:,k);
+        dCdqd(i,k) = S{i}' * dfvpdx{i}(:,k + model.NB);
       end
   end
   
@@ -164,11 +149,11 @@ for i = model.NB:-1:1
     if ifjacobian
         for k = 1:model.NB
           if i == k
-            dfvpdq{model.parent(i)}(:,k) = dfvpdq{model.parent(i)}(:,k) + dXupdq{i}'*fvp{i} + Xup{i}'*dfvpdq{i}(:,k); 
+            dfvpdx{model.parent(i)}(:,k) = dfvpdx{model.parent(i)}(:,k) + dXupdq{i}'*fvp{i} + Xup{i}'*dfvpdx{i}(:,k); 
           else
-            dfvpdq{model.parent(i)}(:,k) = dfvpdq{model.parent(i)}(:,k) + Xup{i}'*dfvpdq{i}(:,k);  
+            dfvpdx{model.parent(i)}(:,k) = dfvpdx{model.parent(i)}(:,k) + Xup{i}'*dfvpdx{i}(:,k);  
           end
-          dfvpdqd{model.parent(i)}(:,k) = dfvpdqd{model.parent(i)}(:,k) + Xup{i}'*dfvpdqd{i}(:,k);
+          dfvpdx{model.parent(i)}(:,k + model.NB) = dfvpdx{model.parent(i)}(:,k + model.NB) + Xup{i}'*dfvpdx{i}(:,k + model.NB);
         end
     end
   end
@@ -258,9 +243,9 @@ for i = 1:model.NB
   end
 end
 
-if ifsymbolic
+if ifsymbolic && ifsimplify
     H = simplify(H);
-%     C = simplify(C);
+    C = simplify(C);
     
     if ifjacobian
         dHdq = simplify(dHdq);
