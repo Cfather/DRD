@@ -60,7 +60,7 @@ for i = 1:robot.NB
             end
         end
         if size(joints(i-1).R,1) == 3 && size(joints(i-1).R,2) == 3
-            robot.Xtree{i} = pluho([joints(i-1).R, joints(i-1).Offset'; 0 0 0 1]);
+            robot.Xtree{i} = inv(pluho([joints(i-1).R, joints(i-1).Offset'; 0 0 0 1]));
         else
             robot.Xtree{i} = rotx(joints(i-1).R(1)) * roty(joints(i-1).R(2)) * rotz(joints(i-1).R(3)) * xlt(joints(i-1).Offset);
         end
