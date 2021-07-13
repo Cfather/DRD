@@ -292,25 +292,40 @@ for i = 1:N
       end
   end
 end
-error('here');
+
 if ifsymbolic
     C = sym(zeros(N,1));
-    dCdq = sym(zeros(N,1));
-    dCdqd = sym(zeros(N,1));
 else
     C = (zeros(N,1));
-    dCdq = (zeros(N,1));
-    dCdqd = (zeros(N,1));
+end
+
+if ifjacobian
+    if ifsymbolic
+        dCdx = sym(zeros(N,2*N));
+    else
+        dCdx = (zeros(N,2*N));
+    end
+end
+
+if ifhessian
+    if ifsymbolic
+        ddCddx = sym(zeros(N,2*N,2*N));
+    else
+        ddCddx = (zeros(N,2*N,2*N));
+    end
 end
 
 for i = N:-1:1
-  C(i,1) = S{i}' * fvp{i};
+  C(i) = S{i}' * fvp{i};
   
   if ifjacobian
-      for k = 1:N 
-        dCdq(i,k) = S{i}' * dfvpdx{i}(:,k);
-        dCdqd(i,k) = S{i}' * dfvpdx{i}(:,k + N);
-      end
+    dCdx(i,:) = S{i}' * dfvpdx{i};
+  end
+  
+  if ifhessian
+    for k = 1:2*N
+        ddCddx(i,k,:) = S{i}' * squeeze(ddfvpddx{i}(:,k,:));
+    end
   end
   
   if model.parent(i) ~= 0
@@ -324,6 +339,50 @@ for i = N:-1:1
             dfvpdx{model.parent(i)}(:,k) = dfvpdx{model.parent(i)}(:,k) + Xup{i}'*dfvpdx{i}(:,k);  
           end
           dfvpdx{model.parent(i)}(:,k + N) = dfvpdx{model.parent(i)}(:,k + N) + Xup{i}'*dfvpdx{i}(:,k + N);
+        end
+    end
+    
+    if ifhessian
+        for k1 = 1:N
+          for k2 = 1:k1
+            if k1 == k2
+              if k1 == i
+                ddfvpddx{model.parent(i)}(:,k1,k2) = ddfvpddx{model.parent(i)}(:,k1,k2) + ddXupddq{i}'*fvp{i} + dXupdq{i}'*dfvpdx{i}(:,k2) + dXupdq{i}'*dfvpdx{i}(:,k1) + Xup{i}'*ddfvpddx{i}(:,k1,k2);
+                ddfvpddx{model.parent(i)}(:,k1,k2 + N) = ddfvpddx{model.parent(i)}(:,k1,k2 + N) + dXupdq{i}'*dfvpdx{i}(:,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1,k2 + N);
+                ddfvpddx{model.parent(i)}(:,k1 + N,k2) = ddfvpddx{model.parent(i)}(:,k1 + N,k2) + dXupdq{i}'*dfvpdx{i}(:,k1 + N) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2);
+                ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) = ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2 + N);
+              else
+                ddfvpddx{model.parent(i)}(:,k1,k2) = ddfvpddx{model.parent(i)}(:,k1,k2) + Xup{i}'*ddfvpddx{i}(:,k1,k2);
+                ddfvpddx{model.parent(i)}(:,k1,k2 + N) = ddfvpddx{model.parent(i)}(:,k1,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1,k2 + N);
+                ddfvpddx{model.parent(i)}(:,k1 + N,k2) = ddfvpddx{model.parent(i)}(:,k1 + N,k2) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2);
+                ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) = ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2 + N);
+              end
+            else
+              if k1 == i
+                ddfvpddx{model.parent(i)}(:,k1,k2) = ddfvpddx{model.parent(i)}(:,k1,k2) + dXupdq{i}'*dfvpdx{i}(:,k2) + Xup{i}'*ddfvpddx{i}(:,k1,k2);
+                ddfvpddx{model.parent(i)}(:,k1,k2 + N) = ddfvpddx{model.parent(i)}(:,k1,k2 + N) + dXupdq{i}'*dfvpdx{i}(:,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1,k2 + N);
+                ddfvpddx{model.parent(i)}(:,k1 + N,k2) = ddfvpddx{model.parent(i)}(:,k1 + N,k2) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2);
+                ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) = ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2 + N); 
+              else
+                if k2 == i
+                  ddfvpddx{model.parent(i)}(:,k1,k2) = ddfvpddx{model.parent(i)}(:,k1,k2) + dXupdq{i}'*dfvpdx{i}(:,k1) + Xup{i}'*ddfvpddx{i}(:,k1,k2);
+                  ddfvpddx{model.parent(i)}(:,k1,k2 + N) = ddfvpddx{model.parent(i)}(:,k1,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1,k2 + N);
+                  ddfvpddx{model.parent(i)}(:,k1 + N,k2) = ddfvpddx{model.parent(i)}(:,k1 + N,k2) + dXupdq{i}'*dfvpdx{i}(:,k1 + N) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2);
+                  ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) = ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2 + N);
+                else
+                  ddfvpddx{model.parent(i)}(:,k1,k2) = ddfvpddx{model.parent(i)}(:,k1,k2) + Xup{i}'*ddfvpddx{i}(:,k1,k2);
+                  ddfvpddx{model.parent(i)}(:,k1,k2 + N) = ddfvpddx{model.parent(i)}(:,k1,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1,k2 + N);
+                  ddfvpddx{model.parent(i)}(:,k1 + N,k2) = ddfvpddx{model.parent(i)}(:,k1 + N,k2) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2);
+                  ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) = ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N) + Xup{i}'*ddfvpddx{i}(:,k1 + N,k2 + N);
+                end
+              end
+              
+              ddfvpddx{model.parent(i)}(:,k2,k1) = ddfvpddx{model.parent(i)}(:,k1,k2);
+              ddfvpddx{model.parent(i)}(:,k2 + N,k1) = ddfvpddx{model.parent(i)}(:,k1,k2 + N);
+              ddfvpddx{model.parent(i)}(:,k2,k1 + N) = ddfvpddx{model.parent(i)}(:,k1 + N,k2);
+              ddfvpddx{model.parent(i)}(:,k2 + N,k1 + N) = ddfvpddx{model.parent(i)}(:,k1 + N,k2 + N);
+            end
+          end
         end
     end
   end
@@ -419,7 +478,7 @@ if ifsymbolic && ifsimplify
     
     if ifjacobian
         dHdq = simplify(dHdq);
-        dCdq = simplify(dCdq);
+        dCdx = simplify(dCdx);
         dCdqd = simplify(dCdqd);
     end
 end
