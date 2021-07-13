@@ -97,7 +97,7 @@ if ifhessian
         end
 
         for i = 1:N
-            ddavpddx{i} = sym(zeros(SpaSize,2*N));
+            ddavpddx{i} = sym(zeros(SpaSize,2*N,2*N));
         end
 % 
 %         for i = 1:N
@@ -177,9 +177,6 @@ for i = 1:N
               end
             else
               if k1 == i
-                if i == 3 && k1 == 3 && k2 == 2
-                    dd = 1;
-                end
                 ddvddx{i}(:,k1,k2) = dXupdq{i}*dvdx{model.parent(i)}(:,k2) + Xup{i}*ddvddx{model.parent(i)}(:,k1,k2);
                 ddvddx{i}(:,k1,k2 + N) = dXupdq{i}*dvdx{model.parent(i)}(:,k2 + N) + Xup{i}*ddvddx{model.parent(i)}(:,k1,k2 + N);
                 ddvddx{i}(:,k1 + N,k2) = Xup{i}*ddvddx{model.parent(i)}(:,k1 + N,k2);
@@ -217,15 +214,66 @@ for i = 1:N
           end
         end
     end
+    
+    if ifhessian
+         ddcrmvddx = dd_crm( v{i}, ddvddx{i}, N, ifsymbolic );
+         for k1 = 1:N
+           for k2 = 1:k1
+             if k1 == k2
+               if k1 == i
+                 ddavpddx{i}(:,k1,k2) = ddXupddq{i}*avp{model.parent(i)} + dXupdq{i}*davpdx{model.parent(i)}(:,k2) + dXupdq{i}*davpdx{model.parent(i)}(:,k1) + Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2) + ddcrmvddx(:,:,k1,k2)*vJ;
+                 ddavpddx{i}(:,k1,k2 + N) = dXupdq{i}*davpdx{model.parent(i)}(:,k2 + N) + Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2 + N) + ddcrmvddx(:,:,k1,k2 + N)*vJ + dcrmvdq(:,:,k1)*S{i};
+                 ddavpddx{i}(:,k1 + N,k2) = dXupdq{i}*davpdx{model.parent(i)}(:,k1 + N) + Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2) + ddcrmvddx(:,:,k1 + N,k2)*vJ + dcrmvdq(:,:,k2)*S{i};
+                 ddavpddx{i}(:,k1 + N,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2 + N) + ddcrmvddx(:,:,k1 + N,k2 + N)*vJ + dcrmvdqd(:,:,k1)*S{i} + dcrmvdqd(:,:,k2)*S{i};
+               else
+                 ddavpddx{i}(:,k1,k2) = Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2) + ddcrmvddx(:,:,k1,k2)*vJ;
+                 ddavpddx{i}(:,k1,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2 + N) + ddcrmvddx(:,:,k1,k2 + N)*vJ;
+                 ddavpddx{i}(:,k1 + N,k2) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2) + ddcrmvddx(:,:,k1 + N,k2)*vJ;
+                 ddavpddx{i}(:,k1 + N,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2 + N) + ddcrmvddx(:,:,k1 + N,k2 + N)*vJ;
+               end
+             else
+               if k1 == i
+                 ddavpddx{i}(:,k1,k2) = dXupdq{i}*davpdx{model.parent(i)}(:,k2) + Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2) + ddcrmvddx(:,:,k1,k2)*vJ;
+                 ddavpddx{i}(:,k1,k2 + N) = dXupdq{i}*davpdx{model.parent(i)}(:,k2 + N) + Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2 + N) + ddcrmvddx(:,:,k1,k2 + N)*vJ;
+                 ddavpddx{i}(:,k1 + N,k2) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2) + ddcrmvddx(:,:,k1 + N,k2)*vJ + dcrmvdq(:,:,k2)*S{i};
+                 ddavpddx{i}(:,k1 + N,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2 + N) + ddcrmvddx(:,:,k1 + N,k2 + N)*vJ + dcrmvdqd(:,:,k1)*S{i} + dcrmvdqd(:,:,k2)*S{i};
+               else
+                 if k2 == i
+                   ddavpddx{i}(:,k1,k2) = dXupdq{i}*davpdx{model.parent(i)}(:,k1) + Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2) + ddcrmvddx(:,:,k1,k2)*vJ;
+                   ddavpddx{i}(:,k1 + N,k2) = dXupdq{i}*davpdx{model.parent(i)}(:,k1 + N) + Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2) + ddcrmvddx(:,:,k1 + N,k2)*vJ;
+                   ddavpddx{i}(:,k1,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2 + N) + ddcrmvddx(:,:,k1,k2 + N)*vJ + dcrmvdq(:,:,k1)*S{i};
+                   ddavpddx{i}(:,k1 + N,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2 + N) + ddcrmvddx(:,:,k1 + N,k2 + N)*vJ + dcrmvdqd(:,:,k2)*S{i} + dcrmvdqd(:,:,k1)*S{i};
+                 else
+                   ddavpddx{i}(:,k1,k2) = Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2) + ddcrmvddx(:,:,k1,k2)*vJ;
+                   ddavpddx{i}(:,k1,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1,k2 + N) + ddcrmvddx(:,:,k1,k2 + N)*vJ;
+                   ddavpddx{i}(:,k1 + N,k2) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2) + ddcrmvddx(:,:,k1 + N,k2)*vJ;
+                   ddavpddx{i}(:,k1 + N,k2 + N) = Xup{i}*ddavpddx{model.parent(i)}(:,k1 + N,k2 + N) + ddcrmvddx(:,:,k1 + N,k2 + N)*vJ;
+                 end
+               end
+               
+               ddavpddx{i}(:,k2,k1) = ddavpddx{i}(:,k1,k2);
+               ddavpddx{i}(:,k2 + N,k1) = ddavpddx{i}(:,k1,k2 + N);
+               ddavpddx{i}(:,k2,k1 + N) = ddavpddx{i}(:,k1 + N,k2);
+               ddavpddx{i}(:,k2 + N,k1 + N) = ddavpddx{i}(:,k1 + N,k2 + N);
+             end
+           end
+         end
+    end
   end
+  
   fvp{i} = model.I{i}*avp{i} + crf(v{i})*model.I{i}*v{i};
   
   if ifjacobian
       [dcrfvdq, dcrfvdqd] = d_crf( v{i}, dvdx{i}(:,1:N), dvdx{i}(:,(N+1):(2*N)), N, ifsymbolic );
+      
       for k = 1:N 
         dfvpdx{i}(:,k) = model.I{i}*davpdx{i}(:,k) + dcrfvdq(:,:,k)*model.I{i}*v{i} + crf(v{i})*model.I{i}*dvdx{i}(:,k);
         dfvpdx{i}(:,k + N) = model.I{i}*davpdx{i}(:,k + N) + dcrfvdqd(:,:,k)*model.I{i}*v{i} + crf(v{i})*model.I{i}*dvdx{i}(:,k + N);
       end
+  end
+  
+  if ifhessian
+      ddcrfvddx = dd_crf( v{i}, ddvddx{i}, N, ifsymbolic );
   end
 end
 
@@ -359,3 +407,5 @@ if ifsymbolic && ifsimplify
         dCdqd = simplify(dCdqd);
     end
 end
+
+toc;
