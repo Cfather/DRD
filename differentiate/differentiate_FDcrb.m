@@ -15,8 +15,8 @@ model = rabbit;
 N = model.NB;
 SpaSize = size(model.I{1},1);
 if ifsymbolic
-    q = sym('q',[N,1]);
-    qd = sym('qd',[N,1]);
+    q = sym('q',[N,1],'real');
+    qd = sym('qd',[N,1],'real');
 else
     q = 2*pi*rand(N,1);
     qd = 2*pi*rand(N,1);
@@ -99,10 +99,10 @@ if ifhessian
         for i = 1:N
             ddavpddx{i} = sym(zeros(SpaSize,2*N,2*N));
         end
-% 
-%         for i = 1:N
-%             dfvpdx{i} = sym(zeros(SpaSize,2*N));
-%         end
+
+        for i = 1:N
+            ddfvpddx{i} = sym(zeros(SpaSize,2*N,2*N));
+        end
     else
         for i = 1:N
             ddXupddq{i} = zeros(SpaSize,SpaSize);
@@ -115,10 +115,10 @@ if ifhessian
         for i = 1:N
             ddavpddx{i} = zeros(SpaSize,2*N,2*N);
         end
-% 
-%         for i = 1:N
-%             dfvpdx{i} = zeros(SpaSize,2*N);
-%         end
+
+        for i = 1:N
+            ddfvpddx{i} = zeros(SpaSize,2*N,2*N);
+        end
     end
 end
 
@@ -274,9 +274,25 @@ for i = 1:N
   
   if ifhessian
       ddcrfvddx = dd_crf( v{i}, ddvddx{i}, N, ifsymbolic );
+      
+      for k1 = 1:N
+        for k2 = 1:k1
+          ddfvpddx{i}(:,k1,k2) = model.I{i}*ddavpddx{i}(:,k1,k2) + ddcrfvddx(:,:,k1,k2)*model.I{i}*v{i} + dcrfvdq(:,:,k1)*model.I{i}*dvdx{i}(:,k2) + dcrfvdq(:,:,k2)*model.I{i}*dvdx{i}(:,k1) + crf(v{i})*model.I{i}*ddvddx{i}(:,k1,k2);
+          ddfvpddx{i}(:,k1,k2 + N) = model.I{i}*ddavpddx{i}(:,k1,k2 + N) + ddcrfvddx(:,:,k1,k2 + N)*model.I{i}*v{i} + dcrfvdq(:,:,k1)*model.I{i}*dvdx{i}(:,k2 + N) + dcrfvdqd(:,:,k2)*model.I{i}*dvdx{i}(:,k1) + crf(v{i})*model.I{i}*ddvddx{i}(:,k1,k2 + N);
+          ddfvpddx{i}(:,k1 + N,k2) = model.I{i}*ddavpddx{i}(:,k1 + N,k2) + ddcrfvddx(:,:,k1 + N,k2)*model.I{i}*v{i} + dcrfvdqd(:,:,k1)*model.I{i}*dvdx{i}(:,k2) + dcrfvdq(:,:,k2)*model.I{i}*dvdx{i}(:,k1 + N) + crf(v{i})*model.I{i}*ddvddx{i}(:,k1 + N,k2);
+          ddfvpddx{i}(:,k1 + N,k2 + N) = model.I{i}*ddavpddx{i}(:,k1 + N,k2 + N) + ddcrfvddx(:,:,k1 + N,k2 + N)*model.I{i}*v{i} + dcrfvdqd(:,:,k1)*model.I{i}*dvdx{i}(:,k2 + N) + dcrfvdqd(:,:,k2)*model.I{i}*dvdx{i}(:,k1 + N) + crf(v{i})*model.I{i}*ddvddx{i}(:,k1 + N,k2 + N);
+                
+          if k1 ~= k2
+            ddfvpddx{i}(:,k2,k1) = ddfvpddx{i}(:,k1,k2);
+            ddfvpddx{i}(:,k2 + N,k1) = ddfvpddx{i}(:,k1,k2 + N);
+            ddfvpddx{i}(:,k2,k1 + N) = ddfvpddx{i}(:,k1 + N,k2);
+            ddfvpddx{i}(:,k2 + N,k1 + N) = ddfvpddx{i}(:,k1 + N,k2 + N);
+          end
+        end
+      end
   end
 end
-
+error('here');
 if ifsymbolic
     C = sym(zeros(N,1));
     dCdq = sym(zeros(N,1));
