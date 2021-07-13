@@ -1,6 +1,6 @@
 clear; clc;
 
-ifsymbolic = true;
+ifsymbolic = false;
 ifjacobian = true;
 ifhessian = true;
 ifsimplify = false;
@@ -9,8 +9,8 @@ if ifhessian
     ifjacobian = true;
 end
 
-% model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\cassie_Lpinned.urdf', 'x');
-model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\rabbit_pinned.urdf', 'y');
+model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\cassie_Lpinned.urdf', 'x');
+% model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\rabbit_pinned.urdf', 'y');
 % model = rabbit;
 N = model.NB;
 SpaSize = size(model.I{1},1);
