@@ -10,8 +10,8 @@ if ifhessian
 end
 
 % model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\cassie_Lpinned.urdf', 'x');
-% model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\rabbit_pinned.urdf', 'y');
-model = rabbit;
+model = create_model_from_urdf('C:\Users\RoahmLab\Documents\DRD\urdf\rabbit_pinned.urdf', 'y');
+% model = rabbit;
 N = model.NB;
 SpaSize = size(model.I{1},1);
 if ifsymbolic
@@ -389,14 +389,30 @@ for i = N:-1:1
 end
 
 IC = model.I;				% composite inertia calculation
-dICdq = cell(1,N);
-if ifsymbolic
-    for i = N:-1:1
-        dICdq{i} = sym(zeros(SpaSize,SpaSize,N));
+
+if ifjacobian
+    dICdq = cell(1,N);
+    if ifsymbolic
+        for i = N:-1:1
+            dICdq{i} = sym(zeros(SpaSize,SpaSize,N));
+        end
+    else
+        for i = N:-1:1
+            dICdq{i} = (zeros(SpaSize,SpaSize,N));
+        end
     end
-else
-    for i = N:-1:1
-        dICdq{i} = (zeros(SpaSize,SpaSize,N));
+end
+
+if ifhessian
+    ddICddq = cell(1,N);
+    if ifsymbolic
+        for i = N:-1:1
+            ddICddq{i} = sym(zeros(SpaSize,SpaSize,N,N));
+        end
+    else
+        for i = N:-1:1
+            ddICddq{i} = (zeros(SpaSize,SpaSize,N,N));
+        end
     end
 end
 
@@ -413,27 +429,92 @@ for i = N:-1:1
             end
         end
     end
+    
+    if ifhessian
+        for k1 = N:-1:1
+          for k2 = N:-1:k1
+            if k1 == k2
+              if k1 == i
+                ddICddq{model.parent(i)}(:,:,k1,k2) = ddXupddq{i}'*IC{i}*Xup{i} + dXupdq{i}'*dICdq{i}(:,:,k2)*Xup{i} + dXupdq{i}'*IC{i}*dXupdq{i} + ... 
+                                                    dXupdq{i}'*dICdq{i}(:,:,j)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,j)*dXupdq{i} + ...
+                                                    dXupdq{i}'*IC{i}*dXupdq{i} + Xup{i}'*dICdq{i}(:,:,k2)*dXupdq{i} + Xup{i}'*IC{i}*ddXupddq{i};
+              else
+                ddICddq{model.parent(i)}(:,:,k1,k2) = Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i};   
+              end
+            else
+              if k1 == i
+                ddICddq{model.parent(i)}(:,:,k1,k2) = dXupdq{i}'*dICdq{i}(:,:,k2)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,k2)*dXupdq{i};  
+              else
+                if k2 == i
+                  ddICddq{model.parent(i)}(:,:,k1,k2) = dXupdq{i}'*dICdq{i}(:,:,k1)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,k1)*dXupdq{i};   
+                else
+                  ddICddq{model.parent(i)}(:,:,k1,k2) = Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i};    
+                end
+              end
+              
+              ddICddq{model.parent(i)}(:,:,k2,k1) = ddICddq{model.parent(i)}(:,:,k1,k2);
+            end
+          end
+        end
+    end
   end
 end
 
 if ifsymbolic
     H = sym(zeros(N));
-    dHdq = sym(zeros(N,N,N));
 else
     H = zeros(N);
-    dHdq = (zeros(N,N,N));
+end
+
+if ifjacobian
+    if ifsymbolic
+        dHdq = sym(zeros(N,N,N));
+    else
+        dHdq = zeros(N,N,N);
+    end
+end
+
+if ifhessian
+    if ifsymbolic
+        ddHddq = sym(zeros(N,N,N,N));
+    else
+        ddHddq = zeros(N,N,N,N);
+    end
 end
 
 for i = 1:N
   fh = IC{i} * S{i};
-  if ifsymbolic
-    dfhdq = sym(zeros(SpaSize,N));
-  else
-    dfhdq = (zeros(SpaSize,N)); 
+  
+  if ifjacobian
+      if ifsymbolic
+        dfhdq = sym(zeros(SpaSize,N));
+      else
+        dfhdq = zeros(SpaSize,N); 
+      end
+      
+      for k = 1:N
+        dfhdq(:,k) = dICdq{i}(:,:,k) * S{i};
+      end
   end
-  for k = 1:N
-    dfhdq(:,k) = dICdq{i}(:,:,k) * S{i};
+  
+  if ifhessian
+      if ifsymbolic
+        ddfhddq = sym(zeros(SpaSize,N,N));
+      else
+        ddfhddq = zeros(SpaSize,N,N); 
+      end
+      
+      for k1 = 1:N
+        for k2 = 1:k1
+          ddfhddq(:,k1,k2) = ddICddq{i}(:,:,k1,k2) * S{i};
+          
+          if k1 ~= k2
+            ddfhddq(:,k2,k1) = ddfhddq(:,k1,k2);
+          end
+        end
+      end
   end
+  
   if isfield(model, 'transmissionInertia')
     H(i,i) = S{i}' * fh + model.transmissionInertia{i};
   else
@@ -446,8 +527,46 @@ for i = 1:N
       end
   end
   
+  if ifhessian
+      for k1 = 1:N
+        for k2 = 1:k1
+          ddHddq(i,i,k1,k2) = S{i}' * ddfhddq(:,k1,k2);
+          
+          if k1 ~= k2
+            ddHddq(i,i,k2,k1) = ddHddq(i,i,k1,k2);
+          end
+        end
+      end 
+  end
+  
   j = i;
   while model.parent(j) > 0
+    if ifhessian
+        for k1 = N:-1:1
+          for k2 = N:-1:k1
+            if k1 == k2
+              if k1 == j
+                ddfhddq(:,k1,k2) = ddXupddq{j}' * fh + dXupdq{j}' * dfhdq(:,k2) + dXupdq{j}' * dfhdq(:,k1) + Xup{j}' * ddfhddq(:,k1,k2);  
+              else
+                ddfhddq(:,k1,k2) = Xup{j}' * ddfhddq(:,k1,k2);   
+              end
+            else
+              if k1 == j
+                ddfhddq(:,k1,k2) = dXupdq{j}' * dfhdq(:,k2) + Xup{j}' * ddfhddq(:,k1,k2);
+              else
+                if k2 == j
+                  ddfhddq(:,k1,k2) = dXupdq{j}' * dfhdq(:,k1) + Xup{j}' * ddfhddq(:,k1,k2);
+                else
+                  ddfhddq(:,k1,k2) = Xup{j}' * ddfhddq(:,k1,k2);
+                end
+              end
+              
+              ddfhddq(:,k2,k1) = ddfhddq(:,k1,k2);
+            end
+          end
+        end
+    end
+    
     if ifjacobian
         for k = 1:N
           if k == j
@@ -464,10 +583,24 @@ for i = 1:N
     H(j,i) = H(i,j);
     
     if ifjacobian
-        for k = 1:N
-          dHdq(i,j,k) = S{j}' * dfhdq(:,k);
-          dHdq(j,i,k) = dHdq(i,j,k);
+      for k = 1:N
+        dHdq(i,j,k) = S{j}' * dfhdq(:,k);
+        dHdq(j,i,k) = dHdq(i,j,k);
+      end
+    end
+    
+    if ifhessian
+      for k1 = 1:N
+        for k2 = 1:k1
+          ddHddq(i,j,k1,k2) = S{j}' * ddfhddq(:,k1,k2);
+          ddHddq(j,i,k1,k2) = ddHddq(i,j,k1,k2);
+          
+          if k1 ~= k2
+            ddHddq(i,j,k2,k1) = ddHddq(i,j,k1,k2);
+            ddHddq(j,i,k2,k1) = ddHddq(j,i,k1,k2);
+          end
         end
+      end 
     end
   end
 end
