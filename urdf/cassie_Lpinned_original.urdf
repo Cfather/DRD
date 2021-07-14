@@ -12,7 +12,7 @@
       <origin rpy="0 0 0" xyz="-.0059731318780634635318138592197101 .0001 .027218453217757652279340518930439"/>
       <mass value=".15"/>
       <inertia ixx="0.000355372316928377" ixy="0.000079515901654595116769541629508922" ixz="-0.000075421422622665130293048707521564" iyy="0.00038350332171041914570280839669181" iyz="0.000063510617959309273081701385788023" izz="0.000171"/>
-    </inertial>
+      </inertial>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
@@ -46,6 +46,7 @@
       </material>
     </visual>
   </link>
+  
   <joint name="ankle_joint_left" type="continuous">
     <origin rpy="0 0 0" xyz="-.408 .04 0"/>
     <axis xyz="0 0 1"/>
@@ -69,6 +70,7 @@
       </material>
     </visual>
   </link>
+  
   <joint name="fixed_knee_to_shin_left" type="fixed">
     <origin rpy="0 0 0" xyz="-.4348 -.02 0"/>
     <parent link="left_shin"/>
@@ -113,6 +115,7 @@
       </material>
     </visual>
   </link>
+  
   <joint name="hip_flexion_left" type="continuous">
     <origin rpy="0 0 0" xyz="-0.12 0 -0.0045"/>
     <axis xyz="0 0 1"/>
@@ -191,6 +194,7 @@
     <inertial>
       <origin rpy="0 0 0" xyz="-.0284 -.1350 .0297"/>
       <mass value="10.33"/>
+      <!--<inertia ixx=".0942" ixy=".000169" ixz=".015" iyy=".084" iyz=".000516" izz=".113"/>-->
       <inertia ixx=".113" ixy="-.000516" ixz="-.015" iyy=".084" iyz="-.000169" izz=".0942"/>
     </inertial>
     <visual>
@@ -203,6 +207,7 @@
       </material>
     </visual>
   </link>
+
   <joint name="fixed_right" type="fixed">
     <origin rpy="0 0 0" xyz="0 -0.27 0"/>
     <parent link="pelvis"/>
@@ -225,7 +230,7 @@
     </visual>
   </link>
   <joint name="hip_abduction_right" type="continuous">
-    <origin rpy="0 -1.5707963267948966192313216916398 0" xyz="0 0 -0.07"/>
+    <origin rpy="0 -1.57079632679 0" xyz="0 0 -0.07"/>
     <axis xyz="1 0 0"/>
     <parent link="right_pelvis_abduction"/>
     <child link="right_pelvis_rotation"/>
@@ -248,7 +253,7 @@
     </visual>
   </link>
   <joint name="hip_rotation_right" type="continuous">
-    <origin rpy="0 1.5707963267948966192313216916398 -1.5707963267948966192313216916398" xyz="0 0 -0.09"/>
+    <origin rpy="0 1.57079632679 -1.57079632679" xyz="0 0 -0.09"/>
     <axis xyz="-1 0 0"/>
     <parent link="right_pelvis_rotation"/>
     <child link="right_hip"/>
@@ -383,7 +388,7 @@
       </material>
     </visual>
   </link>
-  
+
   <transmission name="toe_joint_trans_left" type="transmission_interface/SimpleTransmission">
     <joint name="toe_joint_left"/>
     <actuator name="toe_joint_motor_left"/>
@@ -414,7 +419,7 @@
     <motorInertia>0.000061</motorInertia>
     <mechanicalReduction>25</mechanicalReduction>
   </transmission>
-  
+
   <transmission name="hip_abduction_trans_right" type="transmission_interface/SimpleTransmission">
     <joint name="hip_abduction_right"/>
     <actuator name="hip_abduction_motor_right"/>
