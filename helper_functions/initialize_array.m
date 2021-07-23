@@ -6,6 +6,8 @@ function res = initialize_array(input_type,sizes)
             res = zeros(sizes);
         case 'intval'
             res = intval(zeros(sizes));
+        case 'interval'
+            res = interval(zeros(sizes));
         otherwise
             error('Unrecoginized variable type')
     end
