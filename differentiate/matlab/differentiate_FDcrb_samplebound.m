@@ -7,7 +7,7 @@ end
 
 n = 1;
 d = model.NB - 1;
-N = 2*n+1;
+N = 2*n+2;
 
 wk = linspace(0,2*pi,N+1);
 wk = wk(1:(end-1));

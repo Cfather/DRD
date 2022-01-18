@@ -47,6 +47,10 @@ fbmodel.Xtree = [eye(6) eye(6) eye(6) eye(6) eye(6) model.Xtree];
 
 fbmodel.I = [zeros(6) zeros(6) zeros(6) zeros(6) zeros(6) model.I];
 
+if isfield(fbmodel, 'transmissionInertia')
+  fbmodel.transmissionInertia = [0 0 0 0 0 model.transmissionInertia]; 
+end
+
 if isfield( model, 'appearance' )
   fbmodel.appearance.body = {{}, {}, {}, {}, {}, model.appearance.body{:}};
 end

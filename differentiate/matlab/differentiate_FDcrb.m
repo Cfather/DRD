@@ -366,9 +366,9 @@ for i = N:-1:1
     if ifjacobian
         for j = N:-1:1
             if i == j
-                dICdq{model.parent(i)}(:,:,j) = dXupdq{i}'*IC{i}*Xup{i} + Xup{i}'*dICdq{i}(:,:,j)*Xup{i} + Xup{i}'*IC{i}*dXupdq{i};
+                dICdq{model.parent(i)}(:,:,j) = dICdq{model.parent(i)}(:,:,j) + dXupdq{i}'*IC{i}*Xup{i} + Xup{i}'*dICdq{i}(:,:,j)*Xup{i} + Xup{i}'*IC{i}*dXupdq{i};
             else
-                dICdq{model.parent(i)}(:,:,j) = Xup{i}'*dICdq{i}(:,:,j)*Xup{i};
+                dICdq{model.parent(i)}(:,:,j) = dICdq{model.parent(i)}(:,:,j) + Xup{i}'*dICdq{i}(:,:,j)*Xup{i};
             end
         end
     end
@@ -378,24 +378,24 @@ for i = N:-1:1
           for k2 = N:-1:k1
             if k1 == k2
               if k1 == i
-                ddICddq{model.parent(i)}(:,:,k1,k2) = ddXupddq{i}'*IC{i}*Xup{i} + dXupdq{i}'*dICdq{i}(:,:,k2)*Xup{i} + dXupdq{i}'*IC{i}*dXupdq{i} + ... 
+                ddICddq{model.parent(i)}(:,:,k1,k2) = ddICddq{model.parent(i)}(:,:,k1,k2) + ddXupddq{i}'*IC{i}*Xup{i} + dXupdq{i}'*dICdq{i}(:,:,k2)*Xup{i} + dXupdq{i}'*IC{i}*dXupdq{i} + ... 
                                                     dXupdq{i}'*dICdq{i}(:,:,j)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,j)*dXupdq{i} + ...
                                                     dXupdq{i}'*IC{i}*dXupdq{i} + Xup{i}'*dICdq{i}(:,:,k2)*dXupdq{i} + Xup{i}'*IC{i}*ddXupddq{i};
               else
-                ddICddq{model.parent(i)}(:,:,k1,k2) = Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i};   
+                ddICddq{model.parent(i)}(:,:,k1,k2) = ddICddq{model.parent(i)}(:,:,k1,k2) + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i};   
               end
             else
               if k1 == i
-                ddICddq{model.parent(i)}(:,:,k1,k2) = dXupdq{i}'*dICdq{i}(:,:,k2)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,k2)*dXupdq{i};  
+                ddICddq{model.parent(i)}(:,:,k1,k2) = ddICddq{model.parent(i)}(:,:,k1,k2) + dXupdq{i}'*dICdq{i}(:,:,k2)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,k2)*dXupdq{i};  
               else
                 if k2 == i
-                  ddICddq{model.parent(i)}(:,:,k1,k2) = dXupdq{i}'*dICdq{i}(:,:,k1)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,k1)*dXupdq{i};   
+                  ddICddq{model.parent(i)}(:,:,k1,k2) = ddICddq{model.parent(i)}(:,:,k1,k2) + dXupdq{i}'*dICdq{i}(:,:,k1)*Xup{i} + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i} + Xup{i}'*dICdq{i}(:,:,k1)*dXupdq{i};   
                 else
-                  ddICddq{model.parent(i)}(:,:,k1,k2) = Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i};    
+                  ddICddq{model.parent(i)}(:,:,k1,k2) = ddICddq{model.parent(i)}(:,:,k1,k2) + Xup{i}'*ddICddq{i}(:,:,k1,k2)*Xup{i};    
                 end
               end
               
-              ddICddq{model.parent(i)}(:,:,k2,k1) = ddICddq{model.parent(i)}(:,:,k1,k2);
+              ddICddq{model.parent(i)}(:,:,k2,k1) = ddICddq{model.parent(i)}(:,:,k1,k2) + ddICddq{model.parent(i)}(:,:,k1,k2);
             end
           end
         end
