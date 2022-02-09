@@ -1,6 +1,8 @@
-function robot = create_model_from_urdf(urdf_file_name, base_rot_axis)
+function robot = create_model_from_urdf(urdf_file_name, base_rot_axis, if_floating_base)
 
-% assume pinned model / serial model
+if nargin < 3
+    if_floating_base = false;
+end
 
 if nargin < 2
     base_rot_axis = 'Rx';
@@ -19,6 +21,27 @@ end
 robot.NB = length(links);
 
 robot.parent = 0:(robot.NB-1);
+%More sophisticated parent determiniation
+for i = 2:robot.NB
+    name = links(i).Name;
+    for j = 1:robot.NB - 1
+        if strcmp(joints(j).Child, name)
+            break
+        end
+    end
+    parent = joints(j).Parent;
+    for j = 1:robot.NB
+        if strcmp(links(j).Name, parent)
+            break
+        end
+    end
+    robot.parent(i) = j;
+end
+
+for i = 1:robot.NB
+    robot.jointNames(i) = string(links(i).Name); %Joints are named the same as links in the MuJoCo model
+end
+        
 
 robot.gravity = [0;0;-9.81];
 
@@ -76,10 +99,19 @@ for i = 1:robot.NB
     robot.appearance.body{i} = { 'cyl', [0 0 0; 0 0.4 0], 0.01 };
 end
 
+if if_floating_base
+    robot = floatbase(robot);
+    return;
+end
 
-
-
-
-
-
-
+if nargin < 2
+    %Cut out Rx base joint
+    robot.parent = robot.parent(2:robot.NB) - 1;
+    robot.jointNames = robot.jointNames(2:robot.NB);
+    robot.jtype = {robot.jtype{2:robot.NB}};
+    robot.Xtree = {robot.Xtree{2:robot.NB}};
+    robot.transmissionInertia = {robot.transmissionInertia{2:robot.NB}};
+    robot.I = {robot.I{2:robot.NB}};
+    robot.appearance.body = {robot.appearance.body{2:robot.NB}};
+    robot.NB = robot.NB - 1;
+end
