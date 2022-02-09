@@ -1,4 +1,4 @@
-function robot = create_model_from_urdf(urdf_file_name, base_rot_axis, if_floating_base)
+function robot = create_model_from_urdf(urdf_file_name, base_rot_axis, if_floating_base, uncertainty_mcI)
 
 if nargin < 3
     if_floating_base = false;
@@ -6,11 +6,13 @@ end
 
 if nargin < 2
     base_rot_axis = 'Rx';
+    disable_base_rot_axis = true;
 else
     if strcmp(base_rot_axis, 'x') || strcmp(base_rot_axis, 'y') || strcmp(base_rot_axis, 'z')
         base_rot_axis = ['R',base_rot_axis];
+        disable_base_rot_axis = false;
     else
-        error('Input axis should be x, y or z');
+        disable_base_rot_axis = true;
     end
 end
 
@@ -95,7 +97,12 @@ for i = 1:robot.NB
             end
         end
     end
-    robot.I{i} = mcI(links(i).Mass, links(i).Offset, links(i).Inertia);
+
+    if nargin > 3
+        robot.I{i} = mcI_interval(links(i).Mass, links(i).Offset, links(i).Inertia, uncertainty_mcI.um, uncertainty_mcI.uc, uncertainty_mcI.uI);
+    else
+        robot.I{i} = mcI(links(i).Mass, links(i).Offset, links(i).Inertia);
+    end
     robot.appearance.body{i} = { 'cyl', [0 0 0; 0 0.4 0], 0.01 };
 end
 
@@ -104,7 +111,7 @@ if if_floating_base
     return;
 end
 
-if nargin < 2
+if disable_base_rot_axis
     %Cut out Rx base joint
     robot.parent = robot.parent(2:robot.NB) - 1;
     robot.jointNames = robot.jointNames(2:robot.NB);
