@@ -13,11 +13,13 @@ function  [do1,do2] = d_plux( i1, i2, di1, di2 )
 
 if nargin == 4				% E,r --> X
 
+  error('haven''t finished this yet');
   o1 = [ i1, zeros(3); -i1*skew(i2), i1 ];
   do1 = []; % not finished
 
 else					% X --> E,r
 
+  % 2 inputs now, so need to reorder
   di1 = i2;
 
 %   o1 = i1(1:3,1:3);
