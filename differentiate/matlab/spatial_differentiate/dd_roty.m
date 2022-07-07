@@ -23,3 +23,4 @@ ddXddtheta = [-c  0  s  0  0  0 ;
                0  0  0 -c  0  s ;
                0  0  0  0  0  0 ;
                0  0  0 -s  0 -c ];
+coder.varsize("ddXddtheta", [6,6], [0,0]);

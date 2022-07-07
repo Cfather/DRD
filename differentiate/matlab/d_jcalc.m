@@ -62,11 +62,16 @@ switch code
     dXjdq = d_xlt(3);
     ddXjddq = zeros(6,6);
     S = [0;0;0;0;0;1];
-  case 'r'				% planar revolute
-    Xj = plnr( q, [0 0] );
-    dXjdq = d_plnr(q, [0 0] );
-    ddXjddq = dd_plnr(q, [0 0] );
-    S = [1;0;0];
+%   case 'r'				% planar revolute
+%     Xj = plnr( q, [0 0] );
+%     dXjdq = d_plnr(q, [0 0] );
+%     ddXjddq = dd_plnr(q, [0 0] );
+%     S = [1;0;0];
   otherwise
     error( 'unrecognised joint code ''%s''', code );
+end
+
+coder.varsize('Xj', [6,6], [0,0]);
+coder.varsize('dXjdq', [6,6], [0,0]);
+coder.varsize('ddXjddq', [6,6], [0,0]);
 end
