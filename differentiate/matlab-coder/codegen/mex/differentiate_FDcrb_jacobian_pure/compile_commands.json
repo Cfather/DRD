@@ -1,0 +1,92 @@
+[
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  differentiate_FDcrb_jacobian_pure_data.cpp -o build/glnxa64/differentiate_FDcrb_jacobian_pure_data.o",
+    "file": "differentiate_FDcrb_jacobian_pure_data.cpp",
+    "output": "build/glnxa64/differentiate_FDcrb_jacobian_pure_data.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  rt_nonfinite.cpp -o build/glnxa64/rt_nonfinite.o",
+    "file": "rt_nonfinite.cpp",
+    "output": "build/glnxa64/rt_nonfinite.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  differentiate_FDcrb_jacobian_pure_initialize.cpp -o build/glnxa64/differentiate_FDcrb_jacobian_pure_initialize.o",
+    "file": "differentiate_FDcrb_jacobian_pure_initialize.cpp",
+    "output": "build/glnxa64/differentiate_FDcrb_jacobian_pure_initialize.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  differentiate_FDcrb_jacobian_pure_terminate.cpp -o build/glnxa64/differentiate_FDcrb_jacobian_pure_terminate.o",
+    "file": "differentiate_FDcrb_jacobian_pure_terminate.cpp",
+    "output": "build/glnxa64/differentiate_FDcrb_jacobian_pure_terminate.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  differentiate_FDcrb_jacobian_pure.cpp -o build/glnxa64/differentiate_FDcrb_jacobian_pure.o",
+    "file": "differentiate_FDcrb_jacobian_pure.cpp",
+    "output": "build/glnxa64/differentiate_FDcrb_jacobian_pure.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  error.cpp -o build/glnxa64/error.o",
+    "file": "error.cpp",
+    "output": "build/glnxa64/error.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  d_jcalc.cpp -o build/glnxa64/d_jcalc.o",
+    "file": "d_jcalc.cpp",
+    "output": "build/glnxa64/d_jcalc.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  strcmp.cpp -o build/glnxa64/strcmp.o",
+    "file": "strcmp.cpp",
+    "output": "build/glnxa64/strcmp.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  d_crm.cpp -o build/glnxa64/d_crm.o",
+    "file": "d_crm.cpp",
+    "output": "build/glnxa64/d_crm.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  d_crf.cpp -o build/glnxa64/d_crf.o",
+    "file": "d_crf.cpp",
+    "output": "build/glnxa64/d_crf.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  mtimes.cpp -o build/glnxa64/mtimes.o",
+    "file": "mtimes.cpp",
+    "output": "build/glnxa64/mtimes.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  interface/_coder_differentiate_FDcrb_jacobian_pure_api.cpp -o build/glnxa64/_coder_differentiate_FDcrb_jacobian_pure_api.o",
+    "file": "interface/_coder_differentiate_FDcrb_jacobian_pure_api.cpp",
+    "output": "build/glnxa64/_coder_differentiate_FDcrb_jacobian_pure_api.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  interface/_coder_differentiate_FDcrb_jacobian_pure_mex.cpp -o build/glnxa64/_coder_differentiate_FDcrb_jacobian_pure_mex.o",
+    "file": "interface/_coder_differentiate_FDcrb_jacobian_pure_mex.cpp",
+    "output": "build/glnxa64/_coder_differentiate_FDcrb_jacobian_pure_mex.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  interface/_coder_differentiate_FDcrb_jacobian_pure_info.cpp -o build/glnxa64/_coder_differentiate_FDcrb_jacobian_pure_info.o",
+    "file": "interface/_coder_differentiate_FDcrb_jacobian_pure_info.cpp",
+    "output": "build/glnxa64/_coder_differentiate_FDcrb_jacobian_pure_info.o"
+  },
+  {
+    "directory": "/home/roahmlab/Documents/DRD/differentiate/matlab-coder/codegen/mex/differentiate_FDcrb_jacobian_pure",
+    "command": "/usr/bin/g++ -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I \".\" -I \"/home/roahmlab/Documents/DRD/differentiate/matlab-coder\" -I \"./interface\" -I \"/usr/local/MATLAB/R2021b/extern/include\" -I \".\" -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c  /usr/local/MATLAB/R2021b/extern/version/cpp_mexapi_version.cpp -o build/glnxa64/cpp_mexapi_version.o",
+    "file": "/usr/local/MATLAB/R2021b/extern/version/cpp_mexapi_version.cpp",
+    "output": "build/glnxa64/cpp_mexapi_version.o"
+  }
+]

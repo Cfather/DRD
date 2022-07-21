@@ -1,0 +1,54 @@
+# CompilerName=gcc
+# Mode=optim
+ninja_required_version = 1.3
+
+# Basic folders
+root = .
+builddir = $root/build/glnxa64
+matlabdir = /usr/local/MATLAB/R2021b
+startdir = /home/roahmlab/Documents/DRD/differentiate/matlab-coder
+
+# Toolchain information
+cc = gcc
+cxx = /usr/bin/g++
+linker = gcc
+linkerxx = /usr/bin/g++
+
+cflags =  -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c99 -I "$root" -I "$startdir" -I "$root/interface" -I "$matlabdir/extern/include" -I "." -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c 
+
+cxxflags =  -fexceptions -fPIC -fno-omit-frame-pointer -pthread -std=c++11 -D_GNU_SOURCE -DMATLAB_MEX_FILE  -O2 -fwrapv -DNDEBUG -fvisibility=hidden -std=c++11 -I "$root" -I "$startdir" -I "$root/interface" -I "$matlabdir/extern/include" -I "." -DMODEL=differentiate_FDcrb_jacobian_pure_mex -DMW_NEEDS_VERSION_H -c 
+
+ldflags =  -pthread -Wl,--no-undefined  -shared -lstdc++ -Wl,--as-needed -Wl,-rpath-link,$matlabdir/bin/glnxa64 -L"$matlabdir/bin/glnxa64" -Wl,-rpath-link,$matlabdir/extern/bin/glnxa64 -L"$matlabdir/extern/bin/glnxa64" -lMatlabDataArray -lmx -lmex -lm -lmat  -o differentiate_FDcrb_jacobian_pure_mex.mexa64 -L"$matlabdir/bin/glnxa64" -lmwblas -lemlrt -lcovrt -lut -lmwmathutil 
+
+# Build Rules
+rule cc
+    command = $cc $cflags $in -o $out
+
+rule cxx
+    command = $cxx $cxxflags $in -o $out
+
+rule link
+    command = $linker $in $ldflags
+
+rule linkxx
+    command = $linkerxx $in $ldflags
+
+# Build
+build $builddir/differentiate_FDcrb_jacobian_pure_data.o : cxx $root/differentiate_FDcrb_jacobian_pure_data.cpp
+build $builddir/rt_nonfinite.o : cxx $root/rt_nonfinite.cpp
+build $builddir/differentiate_FDcrb_jacobian_pure_initialize.o : cxx $root/differentiate_FDcrb_jacobian_pure_initialize.cpp
+build $builddir/differentiate_FDcrb_jacobian_pure_terminate.o : cxx $root/differentiate_FDcrb_jacobian_pure_terminate.cpp
+build $builddir/differentiate_FDcrb_jacobian_pure.o : cxx $root/differentiate_FDcrb_jacobian_pure.cpp
+build $builddir/error.o : cxx $root/error.cpp
+build $builddir/d_jcalc.o : cxx $root/d_jcalc.cpp
+build $builddir/strcmp.o : cxx $root/strcmp.cpp
+build $builddir/d_crm.o : cxx $root/d_crm.cpp
+build $builddir/d_crf.o : cxx $root/d_crf.cpp
+build $builddir/mtimes.o : cxx $root/mtimes.cpp
+build $builddir/_coder_differentiate_FDcrb_jacobian_pure_api.o : cxx $root/interface/_coder_differentiate_FDcrb_jacobian_pure_api.cpp
+build $builddir/_coder_differentiate_FDcrb_jacobian_pure_mex.o : cxx $root/interface/_coder_differentiate_FDcrb_jacobian_pure_mex.cpp
+build $builddir/_coder_differentiate_FDcrb_jacobian_pure_info.o : cxx $root/interface/_coder_differentiate_FDcrb_jacobian_pure_info.cpp
+build $builddir/cpp_mexapi_version.o : cxx $matlabdir/extern/version/cpp_mexapi_version.cpp
+
+# Link
+build $root/differentiate_FDcrb_jacobian_pure_mex.mexa64 : linkxx $builddir/differentiate_FDcrb_jacobian_pure_data.o $builddir/rt_nonfinite.o $builddir/differentiate_FDcrb_jacobian_pure_initialize.o $builddir/differentiate_FDcrb_jacobian_pure_terminate.o $builddir/differentiate_FDcrb_jacobian_pure.o $builddir/error.o $builddir/d_jcalc.o $builddir/strcmp.o $builddir/d_crm.o $builddir/d_crf.o $builddir/mtimes.o $builddir/_coder_differentiate_FDcrb_jacobian_pure_api.o $builddir/_coder_differentiate_FDcrb_jacobian_pure_mex.o $builddir/_coder_differentiate_FDcrb_jacobian_pure_info.o $builddir/cpp_mexapi_version.o 
