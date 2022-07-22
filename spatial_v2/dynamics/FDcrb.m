@@ -1,4 +1,4 @@
-function  qdd = FDcrb( model, q, qd, tau, f_ext )
+function qdd = FDcrb( model, q, qd, tau, f_ext)
 
 % FDcrb  Forward Dynamics via Composite-Rigid-Body Algorithm
 % FDcrb(model,q,qd,tau,f_ext)  calculates the forward dynamics of a
@@ -15,4 +15,14 @@ else
   [H,C] = HandC( model, q, qd, f_ext );
 end
 
+for i = 1:model.NB
+    if isfield(model, 'damping')
+        tau(i) = tau(i) - model.damping{i} * qd(i);
+    end
+    if isfield(model, 'friction') && abs(qd(i)) > 10^-8
+        tau(i) = tau(i) - model.friction{i} * sign(qd(i));
+    end
+end
+
 qdd = H \ (tau - C);
+end

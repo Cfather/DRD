@@ -31,6 +31,16 @@ end
 
 for i = model.NB:-1:1
   tau(i,1) = S{i}' * f{i};
+  if isfield(model, 'transmissionInertia')
+    tau(i) = tau(i) + model.transmissionInertia{i} * qdd(i);
+  end
+  if isfield(model, 'damping')
+    tau(i) = tau(i) + model.damping{i} * qd(i);
+  end
+  if isfield(model, 'friction') && abs(qd(i)) > 10^-8
+    tau(i) = tau(i) + model.friction{i} * sign(qd(i));
+  end
+  
   if model.parent(i) ~= 0
     f{model.parent(i)} = f{model.parent(i)} + Xup{i}'*f{i};
   end
